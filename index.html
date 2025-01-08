@@ -1,1 +1,389 @@
-hello world
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: #fff;
+            background-image: url(''); /* 默认背景为空 */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .header {
+            padding: 40px;
+            color: #fff;
+            margin: 0 auto;
+            margin-bottom: 40px;
+        }
+        .header h1,p {
+            text-align: center;
+        }
+
+        .wheel {
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .center-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 60px;
+            background-color: #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-image: url(''); /* 默认中心圆为空 */
+            background-size: cover;
+            cursor: pointer;
+        }
+
+        .triangle {
+            width: 0; 
+            height: 0; 
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent; 
+            border-right: 30px solid rgb(255, 0, 0); 
+            position: absolute;
+            top: 50%;
+            right: -280%;
+            transform: translateY(-50%);
+        }
+
+        textarea {
+            background-color: rgba(20, 20, 20, 0.2);
+            caret-color: #fff;
+            resize: none;
+            color: #fff;
+        }
+
+        .inputArea {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .upload-btn {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .upload-input {
+            margin: 0 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div style="text-align: center;">
+            <input type="text" id="winnerInput" value="大转盘" oninput="updateWinner()" style="font-size: 3em; font-weight: bold; font-family: '华文琥珀', sans-serif; color: #F37A71; text-align: center; border: none; background: transparent;"/>
+        </div>
+        <p id="winner" style="text-align: center; color: #C27984;">NONE</p>
+    </div>
+
+    <div class="wheel">
+        <canvas class="" id="canvas" width="700" height="700"></canvas>
+        <div class="center-circle" onclick="spin()">
+            <div class="triangle"></div>
+        </div>
+    </div>
+
+    <div class="inputArea" onchange="createWheel()">
+        <textarea rows="20" cols="30">
+            北京
+            天津
+            河北
+            山西
+            内蒙古
+            辽宁
+            吉林
+            黑龙江
+            上海
+            江苏
+            浙江
+            安徽
+            福建
+            江西
+            山东
+            河南
+            湖北
+            湖南
+            广东
+            广西
+            海南
+            重庆
+            四川
+            贵州
+            云南
+            西藏
+            陕西
+            甘肃
+            青海
+            宁夏
+            新疆
+            香港
+            澳门
+            台湾</textarea>
+    </div>
+
+    <!-- 上传按钮区域 -->
+    <div class="upload-btn">
+        上传背景图片：<input type="file" class="upload-input" id="bgUpload" accept="image/*" onchange="uploadBackground()" />
+        上传中心图片：<input type="file" class="upload-input" id="centerUpload" accept="image/*" onchange="uploadCenterImage()" />
+        上传浮动图片：<input type="file" class="upload-input" id="draggableUpload" accept="image/*" onchange="uploadDraggableImage()" />
+    </div>
+
+    <!-- 可拖拽图片区域 -->
+    <div id="draggableImage" class="draggable" style="display: none; position: absolute; z-index: 10;"></div>
+    
+
+    <script>
+        function randomColor(i) {
+            if (i % 2 === 0) {
+                return "#FBE5E7"; // 偶数索引返回特定颜色
+            } else {
+                return "#FEFEFE"; // 奇数索引返回特定颜色
+            }
+        }
+
+        function toRad(deg) {
+            return deg * (Math.PI / 180.0);
+        }
+
+        function randomRange(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function easeOutSine(x) {
+            return Math.sin((x * Math.PI) / 2);
+        }
+
+        function getPercent(input, min, max) {
+            return (((input - min) * 100) / (max - min)) / 100
+        }
+    </script>
+
+    <script>
+        const canvas = document.getElementById("canvas")
+        const ctx = canvas.getContext("2d")
+        const width = document.getElementById("canvas").width
+        const height = document.getElementById("canvas").height
+
+        const centerX = width / 2
+        const centerY = height / 2
+        const radius = width / 2 * 0.9; // 将半径设置为canvas宽度的90%
+
+        let items = document.getElementsByTagName("textarea")[0].value.split("\n");
+
+        let currentDeg = 0
+        let step = 360 / items.length
+        let colors = []
+        let itemDegs = {}
+
+        for (let i = 0; i < items.length; i++) {
+            colors.push(randomColor(i)); // 传递索引i给randomColor
+        }
+
+        function createWheel() {
+            items = document.getElementsByTagName("textarea")[0].value.split("\n");
+            step = 360 / items.length
+            colors = []
+            for (let i = 0; i < items.length + 1; i++) {
+                colors.push(randomColor(i))
+            }
+            draw()
+        }
+
+        draw()
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height); // 清除canvas内容
+            ctx.fillStyle = "#FFFFFF"; // 设置canvas背景为白色
+            ctx.fillRect(0, 0, width, height); // 填充背景
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, toRad(0), toRad(360))
+            ctx.fillStyle = `rgb(${33},${33},${33})`
+            ctx.lineTo(centerX, centerY);
+            ctx.fill()
+
+            // 填充转盘圆环和第一个圆环之间的区域
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 1.05, toRad(0), toRad(360));
+            ctx.fillStyle = "#F9AFB0"; // 修改为填充颜色
+            ctx.fill(); // 填充颜色
+
+            // 添加第一个圆环
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 1.05, toRad(0), toRad(360));
+            ctx.strokeStyle = "#CF8888"; // 修改为第一个圆环的颜色
+            ctx.lineWidth = 2; // 加粗第一个圆环
+            ctx.stroke(); // 绘制第一个圆环
+
+            // 添加第二个圆环
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 1.10, toRad(0), toRad(360));
+            ctx.strokeStyle = "#E1A4A2"; // 修改为第二个圆环的颜色
+            ctx.lineWidth = 2; // 加粗第二个圆环
+            ctx.stroke(); // 绘制第二个圆环
+
+            let startDeg = currentDeg;
+            for (let i = 0; i < items.length; i++, startDeg += step) {
+                let endDeg = startDeg + step
+
+                color = colors[i]
+                let colorStyle = colors[i]; // 直接使用颜色字符串
+
+                ctx.beginPath();
+                rad = toRad(360 / step);
+                ctx.arc(centerX, centerY, radius - 2, toRad(startDeg), toRad(endDeg))
+                let colorStyle2 = colors[i]; // 直接使用颜色字符串
+                ctx.fillStyle = colorStyle2
+                ctx.lineTo(centerX, centerY);
+                ctx.fill()
+
+                ctx.beginPath();
+                rad = toRad(360 / step);
+                ctx.arc(centerX, centerY, radius - 30, toRad(startDeg), toRad(endDeg))
+                ctx.fillStyle = colorStyle; // 直接使用颜色字符串
+                ctx.lineTo(centerX, centerY);
+                ctx.fill()
+
+                // draw text
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(toRad((startDeg + endDeg) / 2));
+                ctx.textAlign = "center";
+                if (color.r > 150 || color.g > 150 || color.b > 150) {
+                    ctx.fillStyle = "#B07980";
+                } else {
+                    ctx.fillStyle = "#B07980";
+                }
+                ctx.font = 'bold 24px serif';
+                ctx.fillText(items[i], 130, 10);
+                ctx.restore();
+
+                itemDegs[items[i]] = {
+                    "startDeg": startDeg,
+                    "endDeg": endDeg
+                }
+
+                // check winner
+                if (startDeg % 360 < 360 && startDeg % 360 > 270 && endDeg % 360 > 0 && endDeg % 360 < 90) {
+                    document.getElementById("winner").innerHTML = items[i]
+                }
+            }
+        }
+
+        let speed = 1; // 减小转速
+        let maxRotation = randomRange(360 * 3, 360 * 6)
+        let pause = false
+
+        function animate() {
+            if (pause) {
+                return
+            }
+            currentDeg += speed; // 持续旋转
+            if (currentDeg >= 360) {
+                currentDeg = 0; // 保证角度不会一直增大
+            }
+            draw()
+            window.requestAnimationFrame(animate);
+        }
+
+        // 上传背景图片
+        function uploadBackground() {
+            const fileInput = document.getElementById('bgUpload');
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.body.style.backgroundImage = `url(${e.target.result})`;
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        // 上传中心图片
+        function uploadCenterImage() {
+            const fileInput = document.getElementById('centerUpload');
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.querySelector('.center-circle').style.backgroundImage = `url(${e.target.result})`;
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        // 上传可拖拽图片
+        function uploadDraggableImage() {
+            const fileInput = document.getElementById('draggableUpload');
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const draggableImage = document.getElementById('draggableImage');
+                const img = new Image();
+                img.src = e.target.result;
+
+                img.onload = function() {
+                    const aspectRatio = img.width / img.height; // 计算宽高比
+                    const width = 100; // 设置宽度为100px
+                    const height = width / aspectRatio; // 按比例计算高度
+
+                    draggableImage.style.backgroundImage = `url(${e.target.result})`;
+                    draggableImage.style.width = `${width}px`; // 设置宽度
+                    draggableImage.style.height = `${height}px`; // 设置高度
+                    draggableImage.style.backgroundSize = 'contain'; // 确保图片按比例缩放
+                    draggableImage.style.backgroundRepeat = 'no-repeat'; // 不重复显示图片
+                    draggableImage.style.display = 'block'; // 显示图片
+                };
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        // 实现可拖拽功能
+        const draggableImage = document.getElementById('draggableImage');
+        draggableImage.onmousedown = function (event) {
+            let shiftX = event.clientX - draggableImage.getBoundingClientRect().left;
+            let shiftY = event.clientY - draggableImage.getBoundingClientRect().top;
+
+            function moveAt(pageX, pageY) {
+                draggableImage.style.left = pageX - shiftX + 'px';
+                draggableImage.style.top = pageY - shiftY + 'px';
+            }
+
+            function onMouseMove(event) {
+                moveAt(event.pageX, event.pageY);
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+
+            draggableImage.onmouseup = function () {
+                document.removeEventListener('mousemove', onMouseMove);
+                draggableImage.onmouseup = null;
+            };
+        };
+
+        draggableImage.ondragstart = function() {
+            return false; // 禁止默认拖拽行为
+        };
+
+        // 页面加载时自动开始旋转
+        window.onload = function () {
+            window.requestAnimationFrame(animate);
+        }
+
+        function updateWinner() {
+            const winnerInput = document.getElementById("winnerInput");
+            document.getElementById("winner").innerHTML = winnerInput.value; // 更新显示的赢家文本
+        }
+
+        function spin() {
+            pause = !pause; // 切换暂停状态
+            if (!pause) {
+                window.requestAnimationFrame(animate); // 如果不是暂停状态，继续动画
+            }
+        }
+
+    </script>
+</body>
+</html>

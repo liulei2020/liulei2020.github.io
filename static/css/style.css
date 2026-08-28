@@ -593,6 +593,51 @@ body {
     padding: 10px 0 20px;
 }
 
+.miniprogramList {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.miniprogramItem {
+    margin: 7px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--item_bg_color);
+    border-radius: 8px;
+    padding: 15px;
+    width: calc(25% - 15px);
+    backdrop-filter: blur(var(--card_filter));
+    -webkit-backdrop-filter: blur(var(--card_filter));
+    transition: opacity 0.3s ease, background-color 0.3s ease, border 0.3s ease, transform 0.2s ease;
+}
+
+.miniprogramItem:hover {
+    box-shadow: 0 8px 16px -4px #2c2d300c;
+    transform: translateY(-2px);
+    background-color: var(--item_hover_color);
+}
+
+.miniprogramItem img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.miniprogramItem p {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--item_left_title_color);
+}
+
+.miniprogramNote {
+    font-size: 13px;
+    color: var(--item_left_text_color);
+    margin: 5px 0 0 7px;
+}
+
 .toolItem {
     background-color: var(--item_bg_color);
     border-radius: 8px;
@@ -658,6 +703,10 @@ footer {
         width: calc(50% - 20px);
 
 
+    }
+
+    .miniprogramItem {
+        width: calc(50% - 15px);
     }
 }
 
@@ -741,6 +790,19 @@ footer {
 
     .skill #skillPc {
         display: none;
+    }
+
+    .miniprogramItem {
+        width: calc(50% - 15px);
+        padding: 10px;
+    }
+
+    .miniprogramItem p {
+        font-size: 13px;
+    }
+
+    .miniprogramNote {
+        font-size: 12px;
     }
 
 

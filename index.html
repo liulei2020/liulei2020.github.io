@@ -66,12 +66,12 @@
 		<div class="zyyo-left">
 			<div class="logo" style="background-image: url(./static/img/logo.png);">
 				<img style="position: absolute;top:-15%;left:-10%;width: 120%; aspect-ratio: 1/1;"
-						src="./static/img/logokuang.png" alt="刘磊头像装饰框">
+						src="./static/img/logokuang.png" alt="刘磊头像装饰框" data-i18n-alt="avatarAlt">
 			</div>
 			<div class="left-div left-clock">
 				<div class="clock-date">
-					<span id="clock-year">2025</span> 年 <span id="clock-month">07</span> 月 <span
-						id="clock-day">05</span> 日 <span id="clock-weekday">星期六</span>
+					<span id="clock-year">2025</span><span data-i18n="clockY"> 年 </span><span id="clock-month">07</span><span data-i18n="clockM"> 月 </span><span
+						id="clock-day">05</span><span data-i18n="clockD"> 日 </span><span id="clock-weekday">星期六</span>
 				</div>
 				<div class="clock-time">
 					<span id="clock-hour">17</span>:<span id="clock-minute">41</span>:<span id="clock-second">42</span>
@@ -97,15 +97,15 @@
 			</div>
 
 			<div class="left-div left-tag">
-					<div class="left-tag-item">编程
+					<div class="left-tag-item" data-i18n="tagCode">编程
 					</div>
-					<div class="left-tag-item">写作
+					<div class="left-tag-item" data-i18n="tagWrite">写作
 					</div>
-					<div class="left-tag-item">读书
+					<div class="left-tag-item" data-i18n="tagRead">读书
 					</div>
-					<div class="left-tag-item">做梦
+					<div class="left-tag-item" data-i18n="tagDream">做梦
 					</div>
-					<div class="left-tag-item">听歌
+					<div class="left-tag-item" data-i18n="tagMusic">听歌
 					</div>
 				</div>
 			<div class="left-div left-time">
@@ -158,16 +158,16 @@
 									d="M683.431724 427.431724v-70.62069h-38.311724l30.190345-30.190344-49.964138-49.964138-62.49931 62.49931h-6.002759L494.344828 276.656552l-49.787587 49.964138 30.013793 30.190344h-38.311724v70.62069h88.275862v35.310345h-88.275862v70.62069h88.275862v52.965517h70.62069v-52.965517h88.275862v-70.62069h-88.275862v-35.310345z"
 									p-id="4990"></path>
 							</svg>
-							<div class="iconTip">赞助</div>
-							<div class="iconPop"><img src="./static/img/wxzsm.png" alt="赞助赞赏码"></div>
+							<div class="iconTip" data-i18n="tipSponsor">赞助</div>
+							<div class="iconPop"><img src="./static/img/wxzsm.png" alt="赞助赞赏码" data-i18n-alt="qrAltSponsor"></div>
 						</a><a class="iconItem" data-pop="./static/img/wechat-qr.png" href="javascript:void(0)">
 							<img class="iconImg" src="./static/img/icons/wechat.svg" alt="微信图标">
-							<div class="iconTip">微信</div>
-							<div class="iconPop"><img src="./static/img/wechat-qr.png" alt="个人微信二维码"></div>
+							<div class="iconTip" data-i18n="tipWechat">微信</div>
+							<div class="iconPop"><img src="./static/img/wechat-qr.png" alt="个人微信二维码" data-i18n-alt="qrAltWechat"></div>
 						</a><a class="iconItem" data-pop="./static/img/gzh-qr.png" href="javascript:void(0)">
 							<img class="iconImg" src="./static/img/icons/wechat-gzh.svg" alt="微信公众号图标">
-							<div class="iconTip">公众号</div>
-							<div class="iconPop"><img src="./static/img/gzh-qr.png" alt="微信公众号二维码"></div>
+							<div class="iconTip" data-i18n="tipGzh">公众号</div>
+							<div class="iconPop"><img src="./static/img/gzh-qr.png" alt="微信公众号二维码" data-i18n-alt="qrAltGzh"></div>
 						</a><a class="iconItem" onclick="pop('./static/img/qq.jpg')" href="javascript:void(0)">
 							<svg t="1712319361023" class="icon" viewBox="0 0 1024 1024" version="1.1"
 								xmlns="http://www.w3.org/2000/svg" p-id="1861">
@@ -176,6 +176,8 @@
 									p-id="1862"></path>
 							</svg>
 							<div class="iconTip">QQ</div>
+						</a><a class="iconItem langItem" id="langSwitch" href="javascript:void(0)" aria-label="切换语言 / Switch language">
+							<span class="langText" id="langSwitchText">EN</span>
 						</a> <a class="switch" href="javascript:void(0)">
 							<div class="onoffswitch">
 								<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox"
@@ -198,7 +200,7 @@
 							<span class="gh-total" id="gh-total"></span>
 						</a>
 						<div class="gh-chart" id="gh-chart">
-							<div class="gh-status">正在获取 GitHub 提交记录…</div>
+							<div class="gh-status" data-i18n="ghLoading">正在获取 GitHub 提交记录…</div>
 						</div>
 					</div>
 				</header>
@@ -215,9 +217,9 @@
 								d="M629.333333 202.666667v213.333333h277.333334v448h-512v-213.333333h-277.333334v-448h512z m213.333334 277.333333h-213.333334v170.666667h-170.666666v149.333333h384v-320z m-277.333334-213.333333h-384v320h213.333334v-170.666667h170.666666v-149.333333z m0 213.333333h-106.666666v106.666667h106.666666v-106.666667z"
 								p-id="1892"></path>
 						</svg>site </div>
-					<div class="siteGroupTitle">个人站点</div>
+					<div class="siteGroupTitle" data-i18n="groupPersonal">个人站点</div>
 					<div class="projectList" id="personalSiteList"></div>
-					<div class="siteGroupTitle">友情链接</div>
+					<div class="siteGroupTitle" data-i18n="groupFriends">友情链接</div>
 					<div class="projectList" id="friendLinkList"></div>
 
 
@@ -228,9 +230,9 @@
 							<path
 								d="M464 464H144V144h320v320z m-240-240v160h160V224H224z m656 240V144h-320v320h320z m-240-240v160h160V224H640zM464 880V560H144v320h320z m-240-240v160h160V640H224zM600 600h80v80h-80z m-80 80h80v80h-80z m80 80h80v80h-80z m-80 80h80v80h-80z m160-160h80v80h-80z m0 160h80v80h-80z m80-80h80v80h-80z m0-160h80v80h-80z m80-80h80v80h-80z m-320 0h80v80h-80z"
 								p-id="7902"></path>
-						</svg>小程序 </div>
+						</svg><span data-i18n="titleMiniprogram">小程序</span> </div>
 					<div class="miniprogramList" id="miniprogramList"></div>
-					<p class="miniprogramNote">微信扫码即可进入对应小程序，语言训练码已含邀请码</p>
+					<p class="miniprogramNote" data-i18n="mpNote">微信扫码即可进入对应小程序</p>
 
 					<div class="title">
 						<svg t="1705257422086" class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -252,8 +254,8 @@
 						skills
 					</div>
 					<div class="skill">
-						<img id="skillPc" src="./static/svg/skillPc.svg" alt="技能图谱（桌面版）" srcset="">
-						<img id="skillWap" src="./static/svg/skillWap.svg" alt="技能图谱（移动版）" srcset="">
+						<img id="skillPc" src="./static/svg/skillPc.svg" alt="技能图谱（桌面版）" data-i18n-alt="skillAltPc" srcset="">
+						<img id="skillWap" src="./static/svg/skillWap.svg" alt="技能图谱（移动版）" data-i18n-alt="skillAltWap" srcset="">
 					</div>
 				</main>
 			</div>
@@ -271,6 +273,7 @@
 		</div>
 </body>
 <script src="./static/js/data.js"> </script>
+<script src="./static/js/i18n.js"> </script>
 <script src="./static/js/script.js"> </script>
 
 

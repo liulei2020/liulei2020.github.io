@@ -168,9 +168,14 @@ body {
 }
 
 
+/* 左栏宽度（zyyo-left 与 zyyo-right 共用，只改这里即可） */
+:root {
+    --left-width: 280px;
+}
+
 .zyyo-left {
     overflow-y: scroll;
-    width: 230px;
+    width: var(--left-width);
     height: 100vh;
     display: flex;
     padding: 0 15px;
@@ -295,7 +300,7 @@ body {
 
 
 .zyyo-right {
-    width: calc(100% - 230px);
+    width: calc(100% - var(--left-width));
     display: flex;
     padding: 20px;
   position: relative;
@@ -1231,4 +1236,17 @@ footer {
 
 .miniprogramList--scroll .miniprogramItem {
     flex-shrink: 0;
+}
+
+/* ===== 语言切换按钮（复用 .iconItem 外观，显示目标语言） ===== */
+.langItem .langText {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--item_left_title_color);
+    user-select: none;
+}
+
+.langItem:hover .langText {
+    color: var(--purple_text_color);
 }

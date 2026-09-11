@@ -12,18 +12,97 @@ console.log('  %c/______\\', 'color: #8B4513; font-size: 20px;');
 // 注意：须在下方 .projectItem 按压事件绑定之前执行
 // ============================================================
 
+// ============================================================
+// 多语言（字典：static/js/i18n.js；数据英文字段：data.js 的 En 后缀）
+// 首访跟随浏览器语言（中文环境 zh，其他 en），手动切换后 cookie 记忆一年
+// ============================================================
+var MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+var _langCache = null;
+
+function getLang() {
+    if (_langCache) return _langCache;
+    var saved = getCookie('langState');
+    if (saved === 'zh' || saved === 'en') {
+        _langCache = saved;
+        return _langCache;
+    }
+    var nav = (navigator.languages && navigator.languages[0]) || navigator.language || '';
+    _langCache = /^zh(-|$)/i.test(nav) ? 'zh' : 'en';
+    return _langCache;
+}
+
+// 取字典：当前语言缺 key 时回落中文，再缺省返回 key 本身
+function t(key) {
+    var dict = window.I18N || {};
+    var val = (dict[getLang()] || {})[key];
+    if (val == null) val = (dict.zh || {})[key];
+    return val != null ? val : key;
+}
+
+function tFmt(key, vars) {
+    var s = t(key);
+    for (var k in vars) s = s.split('{' + k + '}').join(vars[k]);
+    return s;
+}
+
+// 数据条目按语言取值：英文模式且有 En 字段时取英文，否则回落中文
+function pickLang(zhVal, enVal) {
+    return (getLang() === 'en' && enVal != null && enVal !== '') ? enVal : zhVal;
+}
+
+// 应用静态文本 + 文档属性 + 切换按钮文案
+function applyI18n() {
+    document.documentElement.lang = getLang() === 'en' ? 'en' : 'zh-CN';
+    document.title = t('docTitle');
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+        el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    document.querySelectorAll('[data-i18n-alt]').forEach(function (el) {
+        el.setAttribute('alt', t(el.getAttribute('data-i18n-alt')));
+    });
+    var btn = document.getElementById('langSwitchText');
+    if (btn) btn.textContent = getLang() === 'zh' ? 'EN' : '中';
+}
+
+// 语言切换后重渲染所有数据区块
+function rerenderAll() {
+    if (typeof SITE_DATA !== 'undefined') {
+        renderProjectList('personalSiteList', SITE_DATA.personal);
+        renderProjectList('friendLinkList', SITE_DATA.friends);
+    }
+    renderMiniPrograms();
+    renderTools();
+    renderTimeline();
+    renderGitHubContributions();
+}
+
+function initLang() {
+    applyI18n();
+    var btn = document.getElementById('langSwitch');
+    if (btn) {
+        btn.addEventListener('click', function () {
+            _langCache = getLang() === 'zh' ? 'en' : 'zh';
+            setCookie('langState', _langCache, 365);
+            applyI18n();
+            rerenderAll();
+        });
+    }
+}
+
 // ---------- site：个人站点 / 友情链接 ----------
 function renderProjectList(elementId, items) {
     var el = document.getElementById(elementId);
     if (!el || !items) return;
     el.innerHTML = items.map(function (it) {
+        var title = pickLang(it.title, it.titleEn);
+        var desc = pickLang(it.desc, it.descEn);
         return '<a class="projectItem a" target="_blank" rel="noopener" href="' + it.url + '">' +
             '<div class="projectItemLeft">' +
-            '<h1>' + it.title + '</h1>' +
-            '<p>' + it.desc + '</p>' +
+            '<h1>' + title + '</h1>' +
+            '<p>' + desc + '</p>' +
             '</div>' +
             '<div class="projectItemRight">' +
-            '<img src="' + it.img + '" alt="' + it.title + '">' +
+            '<img src="' + it.img + '" alt="' + title + '">' +
             '</div>' +
             '</a>';
     }).join('');
@@ -48,7 +127,7 @@ function renderTimeline() {
     el.innerHTML = TIME_LINE.slice().reverse().map(function (it) {
         return '<li>' +
             '<div class="focus"></div>' +
-            '<div>' + it.text + '</div>' +
+            '<div>' + pickLang(it.text, it.textEn) + '</div>' +
             '<div>' + it.date + '</div>' +
             '</li>';
     }).join('');
@@ -56,26 +135,39 @@ function renderTimeline() {
 
 // ---------- GitHub 提交历史热力图 ----------
 var GH_API = 'https://github-contributions-api.jogruber.de/v4/';
+var GH_LAST = null; // 语言切换时用缓存数据直接重画，不重新请求
 
 function renderGitHubContributions() {
     var chart = document.getElementById('gh-chart');
     if (!chart) return;
-    chart.innerHTML = '<div class="gh-status">正在获取 GitHub 提交记录…</div>';
+    if (GH_LAST) {
+        paintContributions(chart, GH_LAST);
+        return;
+    }
+    chart.innerHTML = '<div class="gh-status">' + t('ghLoading') + '</div>';
     fetch(GH_API + GITHUB_USER + '?y=last')
         .then(function (res) {
             if (!res.ok) throw new Error('HTTP ' + res.status);
             return res.json();
         })
         .then(function (data) {
-            var total = (data.total && data.total.lastYear) || 0;
-            var totalEl = document.getElementById('gh-total');
-            if (totalEl) totalEl.textContent = total + ' contributions in the last year';
-            drawContributionGrid(chart, data.contributions || []);
+            GH_LAST = data;
+            paintContributions(chart, data);
         })
         .catch(function () {
-            chart.innerHTML = '<div class="gh-status gh-status-error">提交记录加载失败，点击重试</div>';
-            chart.querySelector('.gh-status').addEventListener('click', renderGitHubContributions);
+            chart.innerHTML = '<div class="gh-status gh-status-error">' + t('ghError') + '</div>';
+            chart.querySelector('.gh-status').addEventListener('click', function () {
+                GH_LAST = null;
+                renderGitHubContributions();
+            });
         });
+}
+
+function paintContributions(chart, data) {
+    var total = (data.total && data.total.lastYear) || 0;
+    var totalEl = document.getElementById('gh-total');
+    if (totalEl) totalEl.textContent = tFmt('ghTotal', { n: total });
+    drawContributionGrid(chart, data.contributions || []);
 }
 
 function drawContributionGrid(chart, contributions) {
@@ -94,7 +186,7 @@ function drawContributionGrid(chart, contributions) {
     while (cells.length % 7 !== 0) cells.push(null);
     var cols = cells.length / 7;
 
-    // 月份标签：取每列中间行的日期，月份变化处标注
+    // 月份标签：取每列中间行的日期，月份变化处标注（zh：3月；en：Mar）
     var monthsHtml = '';
     var prevMonth = -1;
     for (var col = 0; col < cols; col++) {
@@ -102,8 +194,9 @@ function drawContributionGrid(chart, contributions) {
         if (!mid) continue;
         var m = parseDate(mid.date).getUTCMonth();
         if (m !== prevMonth) {
+            var label = getLang() === 'en' ? MONTHS_EN[m] : (m + 1) + '月';
             monthsHtml += '<span class="gh-month" style="left:calc(' + col +
-                ' * (var(--gh-cell) + var(--gh-gap)))">' + (m + 1) + '月</span>';
+                ' * (var(--gh-cell) + var(--gh-gap)))">' + label + '</span>';
             prevMonth = m;
         }
     }
@@ -112,7 +205,7 @@ function drawContributionGrid(chart, contributions) {
     for (var j = 0; j < cells.length; j++) {
         var c = cells[j];
         if (c) {
-            var tip = (c.count === 0 ? '没有提交' : c.count + ' 次提交') + ' · ' + c.date;
+            var tip = (c.count === 0 ? t('ghTipNone') : c.count + ' ' + t('ghTipUnit')) + ' · ' + c.date;
             gridHtml += '<div class="gh-cell" data-level="' + c.level + '" title="' + tip + '"></div>';
         } else {
             gridHtml += '<div class="gh-cell gh-cell-empty"></div>';
@@ -128,15 +221,19 @@ function renderMiniPrograms() {
     var el = document.getElementById('miniprogramList');
     if (!el || typeof MINI_PROGRAMS === 'undefined') return;
     el.innerHTML = MINI_PROGRAMS.map(function (it) {
+        var name = pickLang(it.name, it.nameEn);
         return '<div class="miniprogramItem">' +
-            '<img src="' + it.img + '" alt="' + it.name + '小程序码">' +
-            '<p>' + it.name + '</p>' +
+            '<img src="' + it.img + '" alt="' + name + ' ' + t('qrAltMp') + '">' +
+            '<p>' + name + '</p>' +
             '</div>';
     }).join('');
     setupMiniProgramScroll(el);
 }
 
 function setupMiniProgramScroll(el) {
+    // 语言切换重渲染会再次进入本函数：先拆掉上一轮的监听与定时器，防止重复滚动
+    if (el._mpScrollTeardown) el._mpScrollTeardown();
+
     var items = el.children;
     if (items.length <= 4) return; // 4 个及以内：完整展示，不滚动
 
@@ -188,13 +285,39 @@ function setupMiniProgramScroll(el) {
         if (resetTimer) { clearTimeout(resetTimer); resetTimer = null; }
     }
 
-    el.addEventListener('mouseenter', function () { paused = true; });
-    el.addEventListener('mouseleave', function () { paused = false; });
+    // 悬浮/点击/触摸 → 暂停。关键：必须同时取消已排定的“末尾停留回卷”定时器，
+    // 否则悬浮最后一项（第 5 个）时，1.4s 后回卷仍会触发，列表从手底下滚走
+    function pause() {
+        paused = true;
+        if (resetTimer) { clearTimeout(resetTimer); resetTimer = null; }
+    }
+    function resume() { paused = false; }
 
-    window.addEventListener('resize', function () {
+    el.addEventListener('mouseenter', pause);
+    el.addEventListener('mouseleave', resume);
+    el.addEventListener('click', pause); // 点击同样暂停（含触屏轻点）
+
+    // 触屏无 hover：触摸列表内暂停，触摸列表外恢复
+    function onDocTouchStart(e) {
+        if (!el.contains(e.target)) resume();
+    }
+    document.addEventListener('touchstart', onDocTouchStart, { passive: true });
+
+    function onResize() {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(start, 200);
-    });
+    }
+    window.addEventListener('resize', onResize);
+
+    el._mpScrollTeardown = function () {
+        stop();
+        el.removeEventListener('mouseenter', pause);
+        el.removeEventListener('mouseleave', resume);
+        el.removeEventListener('click', pause);
+        document.removeEventListener('touchstart', onDocTouchStart);
+        window.removeEventListener('resize', onResize);
+        el._mpScrollTeardown = null;
+    };
 
     start();
 }
@@ -220,7 +343,7 @@ function setupIconPops() {
             var showFallback = function () {
                 var fb = document.createElement('div');
                 fb.className = 'iconPop-fallback';
-                fb.textContent = '待放置二维码图片：' + img.getAttribute('src').split('/').pop();
+                fb.textContent = tFmt('qrFallback', { f: img.getAttribute('src').split('/').pop() });
                 img.replaceWith(fb);
             };
             // 本地 404 可能先于 error 监听绑定完成，需检查加载状态
@@ -234,7 +357,8 @@ function setupIconPops() {
     document.addEventListener('click', closeAllIconPops);
 }
 
-// ---------- 启动渲染 ----------
+// ---------- 启动渲染（先初始化语言，静态文本与数据渲染均按当前语言输出） ----------
+initLang();
 if (typeof SITE_DATA !== 'undefined') {
     renderProjectList('personalSiteList', SITE_DATA.personal);
     renderProjectList('friendLinkList', SITE_DATA.friends);
@@ -270,8 +394,11 @@ function updateClock() {
     document.getElementById('clock-month').textContent = String(now.getMonth() + 1).padStart(2, '0');
     document.getElementById('clock-day').textContent = String(now.getDate()).padStart(2, '0');
     
-    // 更新星期
-    const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    // 更新星期（按当前语言）
+    var lang = getLang();
+    var weekdays = lang === 'en'
+        ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        : ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
     document.getElementById('clock-weekday').textContent = weekdays[now.getDay()];
     
     // 更新时间

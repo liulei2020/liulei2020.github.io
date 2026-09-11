@@ -154,7 +154,7 @@ body {
     backdrop-filter:  blur(var(--back_filter));
     -webkit-backdrop-filter: blur(var(--back_filter));
     z-index: -99999999;
-   
+    transition: background-color 0.3s ease;
 }
 
 .zyyo-main {
@@ -381,7 +381,8 @@ body {
     height: 60px;
     display: flex;
     align-items: center;
-    overflow-x: scroll;
+    /* 改为 visible：二维码气泡显示在图标上方，不能被容器裁剪 */
+    overflow-x: visible;
     margin-top: 20px;
 
 }
@@ -393,6 +394,7 @@ body {
 
 
 .iconItem {
+    position: relative;
     width: 49px;
     height: 43px;
     box-sizing: border-box;
@@ -457,14 +459,140 @@ body {
     background: var(--item_hover_color);
 }
 
+/* GitHub 提交历史热力图容器（左边缘与 .title 等其他元素对齐） */
 .tanChiShe {
     width: 85%;
+    margin: 0;
+    box-sizing: border-box;
+    background-color: var(--item_bg_color);
+    border-radius: 10px;
+    padding: 14px 14px 16px;
+    backdrop-filter: blur(var(--card_filter));
+    -webkit-backdrop-filter: blur(var(--card_filter));
 }
 
-.tanChiShe img {
+.gh-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    text-decoration: none;
+    color: var(--item_left_title_color);
+}
+
+.gh-icon {
+    width: 16px;
+    height: 16px;
+    fill: var(--item_left_title_color);
+    flex-shrink: 0;
+}
+
+.gh-title {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.gh-total {
+    font-size: 12px;
+    color: var(--item_left_text_color);
+    opacity: 0.8;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.gh-chart {
+    /* 格子尺寸变量：月份标签定位与格子共用 */
+    --gh-cell: 10px;
+    --gh-gap: 3px;
+    /* GitHub 亮色贡献色阶（默认） */
+    --gh-l0: #ebedf0;
+    --gh-l1: #9be9a8;
+    --gh-l2: #40c463;
+    --gh-l3: #30a14e;
+    --gh-l4: #216e39;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    overflow-x: auto;
+}
+
+.gh-chart::-webkit-scrollbar {
+    height: 6px;
+}
+
+.gh-chart::-webkit-scrollbar-thumb {
+    background-color: #00000026;
+    border-radius: 3px;
+}
+
+html[data-theme="Dark"] .gh-chart::-webkit-scrollbar-thumb {
+    background-color: #ffffff26;
+}
+
+.gh-chart::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+html[data-theme="Dark"] .gh-chart {
+    --gh-l0: #1b212b;
+    --gh-l1: #0e4429;
+    --gh-l2: #006d32;
+    --gh-l3: #26a641;
+    --gh-l4: #39d353;
+}
+
+.gh-months {
+    position: relative;
+    height: 14px;
+    margin-bottom: 4px;
+}
+
+.gh-month {
+    position: absolute;
+    top: 0;
+    font-size: 10px;
+    line-height: 14px;
+    color: var(--item_left_text_color);
+    opacity: 0.7;
+    white-space: nowrap;
+}
+
+.gh-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(7, var(--gh-cell));
+    grid-auto-columns: var(--gh-cell);
+    gap: var(--gh-gap);
+    width: max-content;
+}
+
+.gh-cell {
+    border-radius: 2px;
+    background-color: var(--gh-l0);
+}
+
+.gh-cell-empty {
+    background-color: transparent;
+}
+
+.gh-cell[data-level="1"] { background-color: var(--gh-l1); }
+.gh-cell[data-level="2"] { background-color: var(--gh-l2); }
+.gh-cell[data-level="3"] { background-color: var(--gh-l3); }
+.gh-cell[data-level="4"] { background-color: var(--gh-l4); }
+
+.gh-status {
+    font-size: 13px;
+    color: var(--item_left_text_color);
+    padding: 18px 0;
+    text-align: center;
+    opacity: 0.8;
+}
+
+.gh-status-error {
+    cursor: pointer;
+}
+
+.gh-status-error:hover {
+    opacity: 1;
+    text-decoration: underline;
 }
 
 .title {
@@ -639,16 +767,36 @@ body {
 }
 
 .toolItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     background-color: var(--item_bg_color);
     border-radius: 8px;
     padding: 10px 18px;
     font-size: 14px;
     font-weight: 600;
     color: var(--item_left_title_color);
+    text-decoration: none;
     backdrop-filter: blur(var(--card_filter));
     -webkit-backdrop-filter: blur(var(--card_filter));
     transition: transform 0.2s ease, background-color 0.2s ease;
-    cursor: default;
+    cursor: pointer;
+}
+
+.toolIcon {
+    height: 18px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+    border-radius: 4px;
+}
+
+.siteGroupTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--item_left_title_color);
+    opacity: 0.65;
+    margin: 14px 0 2px 10px;
 }
 
 .toolItem:hover {
@@ -988,4 +1136,99 @@ footer {
 
 .onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-switch {
     right: 50%;
+}
+
+/* ===== GitHub 热力图移动端适配 ===== */
+@media (max-width: 800px) {
+    .gh-chart {
+        --gh-cell: 9px;
+        --gh-gap: 2px;
+    }
+
+    .gh-total {
+        display: none;
+    }
+
+    .siteGroupTitle {
+        margin-left: 8px;
+    }
+}
+
+/* ===== 顶部图标：二维码气泡（悬浮/点击时显示在图标上方） ===== */
+.iconItem > img.iconImg {
+    width: 22px;
+    height: 22px;
+    margin-right: 3px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.iconPop {
+    position: absolute;
+    bottom: calc(100% + 14px);
+    left: 50%;
+    transform: translateX(-50%) translateY(8px) scale(0.92);
+    width: 170px;
+    padding: 8px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    z-index: 999;
+}
+
+.iconPop img {
+    display: block;
+    width: 100%;
+    border-radius: 6px;
+}
+
+/* 气泡底部小箭头 */
+.iconPop::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 7px solid transparent;
+    border-top-color: #ffffff;
+}
+
+.iconItem:hover .iconPop,
+.iconItem.active .iconPop {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* 二维码图片缺失时的占位提示（仅替换气泡内的 img，保留气泡容器） */
+.iconPop-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 140px;
+    box-sizing: border-box;
+    border: 1px dashed #bbbbbb;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #999999;
+    text-align: center;
+    padding: 8px;
+    word-break: break-all;
+}
+
+/* ===== 小程序列表自动横向滚动（>4 个时由 JS 启用） ===== */
+.miniprogramList.miniprogramList--scroll {
+    flex-wrap: nowrap;
+    overflow: hidden;
+    scroll-behavior: smooth;
+}
+
+.miniprogramList--scroll .miniprogramItem {
+    flex-shrink: 0;
 }

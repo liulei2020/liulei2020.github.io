@@ -48,7 +48,7 @@
 		"knowsAbout": ["编程", "写作", "读书"],
 		"worksFor": {
 			"@type": "Organization",
-			"name": "SuikunTech"
+			"name": " "
 		}
 	}
 	</script>
@@ -93,7 +93,7 @@
 						<path
 							d="M112 288h800v544a64 64 0 0 1-64 64H176a64 64 0 0 1-64-64V288z m576-32v-64a64 64 0 0 0-64-64H400a64 64 0 0 0-64 64v64H224a64 64 0 0 0-64 64v96h704v-96a64 64 0 0 0-64-64h-112zM448 256v-32h128v32h-128z"
 							p-id="8002"></path>
-					</svg>SuikunTech</div>
+					</svg></div>
 			</div>
 
 			<div class="left-div left-tag">
@@ -108,40 +108,9 @@
 					<div class="left-tag-item">听歌
 					</div>
 				</div>
-				<div class="left-div left-time">
-					<ul id="line">
-						<li>
-							<div class="focus"></div>
-							<div>敬请期待
-							</div>
-							<div>2026.1</div>
-						</li>
-						<li>
-							<div class="focus"></div>
-							<div>ICP备案成功
-							</div>
-							<div>2022.3</div>
-						</li>
-						<li>
-							<div class="focus"></div>
-							<div>注册域名liuleinet.top
-							</div>
-							<div>2022.3</div>
-						</li>
-
-						<li>
-							<div class="focus"></div>
-							<div>...
-							</div>
-							<div>...</div>
-						</li>
-						<li>
-							<div class="focus"></div>
-							<div>搭建第一个网站</div>
-							<div>2021.10</div>
-						</li>
-					</ul>
-				</div>
+			<div class="left-div left-time">
+				<ul id="line"></ul>
+			</div>
 			</div>
 			<div class="zyyo-right">
 				<header>
@@ -176,7 +145,7 @@
 									p-id="3175"></path>
 							</svg>
 							<div class="iconTip">Mail</div>
-						</a><a class="iconItem" onclick="pop('./static/img/wxzsm.png')" href="javascript:void(0)">
+						</a><a class="iconItem" data-pop="./static/img/wxzsm.png" href="javascript:void(0)">
 							<svg t="1705247464964" class="icon" viewBox="0 0 1024 1024" version="1.1"
 								xmlns="http://www.w3.org/2000/svg" p-id="4987">
 								<path
@@ -190,6 +159,15 @@
 									p-id="4990"></path>
 							</svg>
 							<div class="iconTip">赞助</div>
+							<div class="iconPop"><img src="./static/img/wxzsm.png" alt="赞助赞赏码"></div>
+						</a><a class="iconItem" data-pop="./static/img/wechat-qr.png" href="javascript:void(0)">
+							<img class="iconImg" src="./static/img/icons/wechat.svg" alt="微信图标">
+							<div class="iconTip">微信</div>
+							<div class="iconPop"><img src="./static/img/wechat-qr.png" alt="个人微信二维码"></div>
+						</a><a class="iconItem" data-pop="./static/img/gzh-qr.png" href="javascript:void(0)">
+							<img class="iconImg" src="./static/img/icons/wechat-gzh.svg" alt="微信公众号图标">
+							<div class="iconTip">公众号</div>
+							<div class="iconPop"><img src="./static/img/gzh-qr.png" alt="微信公众号二维码"></div>
 						</a><a class="iconItem" onclick="pop('./static/img/qq.jpg')" href="javascript:void(0)">
 							<svg t="1712319361023" class="icon" viewBox="0 0 1024 1024" version="1.1"
 								xmlns="http://www.w3.org/2000/svg" p-id="1861">
@@ -211,7 +189,17 @@
 					</div>
 
 					<div class="tanChiShe">
-						<img id="tanChiShe" src="./static/svg/snake-Light.svg" alt="">
+						<a class="gh-header" href="https://github.com/liulei2020" target="_blank" rel="noopener">
+							<svg class="gh-icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+								<path
+									d="M511.6 76.3C264.3 76.2 64 276.4 64 523.5 64 718.9 189.3 885 363.8 946c23.5 5.9 19.9-10.8 19.9-22.2v-77.5c-135.7 15.9-141.2-73.9-150.3-88.9C215 726 171.5 718 184.5 703c30.9-15.9 62.4 4 98.9 57.9 26.4 39.1 77.9 32.5 104 26 5.7-23.5 17.9-44.5 34.7-60.8-140.6-25.2-199.2-111-199.2-213 0-49.5 16.3-95 48.3-131.7-20.4-60.5 1.9-112.3 4.9-120 58.1-5.2 118.5 41.6 123.2 45.3 33-8.9 70.7-13.6 112.9-13.6 42.4 0 80.2 4.9 113.5 13.9 11.3-8.6 67.3-48.8 121.3-43.9 2.9 7.7 24.7 58.3 5.5 118 32.4 36.8 48.9 82.7 48.9 132.3 0 102.2-59 188.1-200 212.9 23.5 23.2 38.1 55.4 38.1 91v112.5c0.8 9 0 17.9 15 17.9 177.1-59.7 304.6-227 304.6-424.1 0-247.2-200.4-447.3-447.5-447.3z">
+							</svg>
+							<span class="gh-title">GitHub</span>
+							<span class="gh-total" id="gh-total"></span>
+						</a>
+						<div class="gh-chart" id="gh-chart">
+							<div class="gh-status">正在获取 GitHub 提交记录…</div>
+						</div>
 					</div>
 				</header>
 
@@ -227,28 +215,10 @@
 								d="M629.333333 202.666667v213.333333h277.333334v448h-512v-213.333333h-277.333334v-448h512z m213.333334 277.333333h-213.333334v170.666667h-170.666666v149.333333h384v-320z m-277.333334-213.333333h-384v320h213.333334v-170.666667h170.666666v-149.333333z m0 213.333333h-106.666666v106.666667h106.666666v-106.666667z"
 								p-id="1892"></path>
 						</svg>site </div>
-					<div class="projectList">
-						<a class="projectItem a" target="_blank" href="https://blog.liuleinet.top">
-							<div class="projectItemLeft">
-								<h1>博客</h1>
-								<p>记录摆烂日常</p>
-							</div>
-							<div class="projectItemRight">
-								<img src="./static/img/i1.png" alt="博客">
-							</div>
-
-						</a>
-						<a class="projectItem a" target="_blank" href="https://langtrain.suikuntech.com">
-							<div class="projectItemLeft">
-								<h1>语言反射训练平台</h1>
-								<p>快速习得外语口语</p>
-							</div>
-							<div class="projectItemRight">
-								<img src="./static/img/i2.png" alt="语言反射训练平台">
-							</div>
-
-						</a>
-					</div>
+					<div class="siteGroupTitle">个人站点</div>
+					<div class="projectList" id="personalSiteList"></div>
+					<div class="siteGroupTitle">友情链接</div>
+					<div class="projectList" id="friendLinkList"></div>
 
 
 
@@ -259,24 +229,7 @@
 								d="M464 464H144V144h320v320z m-240-240v160h160V224H224z m656 240V144h-320v320h320z m-240-240v160h160V224H640zM464 880V560H144v320h320z m-240-240v160h160V640H224zM600 600h80v80h-80z m-80 80h80v80h-80z m80 80h80v80h-80z m-80 80h80v80h-80z m160-160h80v80h-80z m0 160h80v80h-80z m80-80h80v80h-80z m0-160h80v80h-80z m80-80h80v80h-80z m-320 0h80v80h-80z"
 								p-id="7902"></path>
 						</svg>小程序 </div>
-					<div class="miniprogramList">
-						<div class="miniprogramItem">
-							<img src="./images/eng-app-qrcode_with_invite_code.png" alt="语言训练小程序码">
-							<p>语言训练</p>
-						</div>
-						<div class="miniprogramItem">
-							<img src="./images/word-game-qrcode.png" alt="背单词游戏小程序码">
-							<p>背单词游戏</p>
-						</div>
-						<div class="miniprogramItem">
-							<img src="./images/cert-app-qrcode.png" alt="证书查询小程序码">
-							<p>证书查询</p>
-						</div>
-						<div class="miniprogramItem">
-							<img src="./images/couple-app-qrcode.png" alt="情侣互动小程序码">
-							<p>情侣互动</p>
-						</div>
-					</div>
+					<div class="miniprogramList" id="miniprogramList"></div>
 					<p class="miniprogramNote">微信扫码即可进入对应小程序，语言训练码已含邀请码</p>
 
 					<div class="title">
@@ -287,12 +240,7 @@
 								p-id="7802"></path>
 						</svg>Tools
 					</div>
-					<div class="tools">
-						<span class="toolItem">Claude Code</span>
-						<span class="toolItem">Codex</span>
-						<span class="toolItem">OpenCode</span>
-						<span class="toolItem">Harness</span>
-					</div>
+					<div class="tools" id="toolList"></div>
 
 					<div class="title">
 						<svg t="1705257823317" class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -322,6 +270,7 @@
 
 		</div>
 </body>
+<script src="./static/js/data.js"> </script>
 <script src="./static/js/script.js"> </script>
 
 
